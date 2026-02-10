@@ -1,4 +1,28 @@
-const Login = ({ handleLogin, username, handleUsername, password, handlePassword, loginNotification }) => {
+import { useState } from 'react'
+
+const Login = ({ onLogin }) => {
+
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [loginNotification, setLoginNotification] = useState('')
+
+  const handleUsername = (event) => setUsername(event.target.value)
+  const handlePassword = (event) => setPassword(event.target.value)
+
+  const handleLogin = (event) => {
+    event.preventDefault()
+    const userObj = { username, password }
+    if (!username || !password)
+    {
+      setLoginNotification('username/ password are required')
+      setTimeout(() => setLoginNotification(''), 5000)
+      return
+    }
+    onLogin(userObj)
+
+    setPassword('')
+
+  }
 
   return (<div>
     <h1>log in to application </h1>

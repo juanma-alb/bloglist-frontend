@@ -9,17 +9,9 @@ import Form  from './components/Form'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-
   const [isLoading, setIsLoading] = useState(true)
-
-  const [loginNotification, setLoginNotification] = useState('')
   const [notification, setNotification] = useState('')
-
-
 
   useEffect(() => {
     const getAllBlogs = async () => {
@@ -46,27 +38,30 @@ const App = () => {
     return (<h1> loading... </h1>)
 
   //login
-  const handleLogin = async (event) => {
-    event.preventDefault()
+  const loginUser = async (userObj) => {
     try {
-      const currentUser = await loginService.login({ username, password })
+      const currentUser = await loginService.login(userObj)
+
       setUser(currentUser)
+
       window.localStorage.setItem(
         'loggedUser', JSON.stringify(currentUser)
       )
+
       blogService.setToken(currentUser.token)
-      setUsername('')
-      setPassword('')
+
       setNotification(`welcome back ${currentUser.name}`)
       setTimeout(() => setNotification(''), 5000)
+
     } catch (error) {
+
       if (error.response.data.error.includes('invalid username or password')) {
-        setLoginNotification(error.response.data.error)
-        setTimeout(() => setLoginNotification(''), 5000)
+        setNotification(error.response.data.error)
+        setTimeout(() => setNotification(''), 5000)
 
       } else {
-        setLoginNotification('somethig went wrong, try again')
-        setTimeout(() => setLoginNotification(''), 5000)
+        setNotification('somethig went wrong, try again')
+        setTimeout(() => setNotification(''), 5000)
       }
       console.error (error)
     }
@@ -76,8 +71,8 @@ const App = () => {
   const logout = (event) => {
     event.preventDefault()
     window.localStorage.removeItem('loggedUser')
-    setLoginNotification('logged out succesfully')
-    setTimeout(() => setLoginNotification(''), 5000)
+    setNotification('logged out succesfully')
+    setTimeout(() => setNotification(''), 5000)
     setUser(null)
 
   }
@@ -107,23 +102,12 @@ const App = () => {
     }
   }
 
-  //handlers
-  const handleUsername = (event) => setUsername(event.target.value)
-  const handlePassword = (event) => setPassword(event.target.value)
-
-
-
   return (
     <div>
       <div>{notification}</div>
       {user===null
         ? (<Login
-          handleLogin={handleLogin}
-          username={username}
-          handleUsername={handleUsername}
-          password={password}
-          handlePassword={handlePassword}
-          loginNotification={loginNotification}
+          onLogin={loginUser}
         />)
         :(<div>
           <div>

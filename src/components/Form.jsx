@@ -5,7 +5,7 @@ const Form = ({ onCreate }) => {
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
 
-  const handleSumbit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault()
 
     const newBlog = {
@@ -27,7 +27,7 @@ const Form = ({ onCreate }) => {
   return (
     <div>
       <h2>create new</h2>
-      <form onSubmit={handleSumbit}>
+      <form onSubmit={handleSubmit}>
         <div>
           <input
             type='text'
