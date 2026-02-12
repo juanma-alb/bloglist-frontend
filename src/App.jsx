@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -6,6 +6,7 @@ import loginService from './services/login'
 import Blog from './components/Blog'
 import Login from './components/Login'
 import Form  from './components/Form'
+import Toggleable from './components/Toggleable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -13,13 +14,14 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [notification, setNotification] = useState('')
 
+  const blogPostRef = useRef()
+
+  //get blogs-------------------------------------------------------
   useEffect(() => {
     const getAllBlogs = async () => {
       const allBlogs = await blogService.getAll()
       setBlogs(allBlogs)
       setIsLoading(false)
-
-
     }
     getAllBlogs()
 
@@ -37,7 +39,7 @@ const App = () => {
   if (isLoading)
     return (<h1> loading... </h1>)
 
-  //login
+  //login---------------------------------------------------------------------
   const loginUser = async (userObj) => {
     try {
       const currentUser = await loginService.login(userObj)
@@ -55,7 +57,7 @@ const App = () => {
 
     } catch (error) {
 
-      if (error.response.data.error.includes('invalid username or password')) {
+      if (error.response.data.error.includes('wrong username or password')) {
         setNotification(error.response.data.error)
         setTimeout(() => setNotification(''), 5000)
 
@@ -67,7 +69,7 @@ const App = () => {
     }
   }
 
-  //logout
+  //logout-------------------------------------
   const logout = (event) => {
     event.preventDefault()
     window.localStorage.removeItem('loggedUser')
@@ -77,7 +79,7 @@ const App = () => {
 
   }
 
-  //create blog
+  //create blog---------------------------------------------------------
   const addBlog = async (blogObject) => {
 
     const blogExist = blogs.some(blog => blog.title === blogObject.title)
@@ -94,6 +96,7 @@ const App = () => {
       setBlogs(blogs.concat(newBlog))
       setNotification('blog succesfully added')
       setTimeout(() => setNotification(''), 5000)
+      blogPostRef.current.setVisibility()
 
 
     } catch (error) {
@@ -114,7 +117,7 @@ const App = () => {
             <h3> {user.name} logged in <button onClick={logout}> logout </button></h3>
           </div>
           <br/>
-          <Form onCreate={addBlog}/>
+          <Toggleable buttonLabel='add Note' buttonLabel2="cancel" ref={blogPostRef}><Form onCreate={addBlog}/></Toggleable>
           <br/>
 
           <h2>blogs</h2>

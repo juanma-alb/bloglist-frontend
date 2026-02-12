@@ -4,6 +4,7 @@ const Form = ({ onCreate }) => {
   const [newTitle, setNewTitle] = useState('')
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
+  const [formNotification, setFormNotification] = useState('')
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -12,6 +13,12 @@ const Form = ({ onCreate }) => {
       title: newTitle,
       author: newAuthor,
       url: newUrl
+    }
+
+    if (!newTitle || !newAuthor || !newUrl) {
+      setFormNotification('title/ author/ url are required')
+      setTimeout(() => setFormNotification(''), 5000)
+      return
     }
     onCreate(newBlog)
 
@@ -27,6 +34,7 @@ const Form = ({ onCreate }) => {
   return (
     <div>
       <h2>create new</h2>
+      <h3>{formNotification}</h3>
       <form onSubmit={handleSubmit}>
         <div>
           <input
