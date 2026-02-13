@@ -6,14 +6,87 @@ const Login = ({ onLogin }) => {
   const [password, setPassword] = useState('')
   const [loginNotification, setLoginNotification] = useState('')
 
+
+  const containerStyle = {
+    maxWidth: '400px',
+    margin: '40px auto',
+    padding: '30px',
+    backgroundColor: 'white',
+    borderRadius: '12px',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    border: '1px solid #e5e7eb',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+  }
+
+  const headerStyle = {
+    margin: '0 0 20px 0',
+    color: '#111827',
+    fontSize: '1.5rem',
+    fontWeight: '700',
+    textAlign: 'center'
+  }
+
+  const formStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px'
+  }
+
+  const inputGroupStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px'
+  }
+
+  const labelStyle = {
+    fontSize: '0.9rem',
+    fontWeight: '600',
+    color: '#374151'
+  }
+
+  const inputStyle = {
+    padding: '12px',
+    borderRadius: '6px',
+    border: '1px solid #d1d5db',
+    fontSize: '1rem',
+    width: '100%',
+    boxSizing: 'border-box',
+    transition: 'border-color 0.2s'
+  }
+
+  const buttonStyle = {
+    marginTop: '10px',
+    padding: '12px',
+    backgroundColor: '#2563eb',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '1rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    width: '100%',
+    transition: 'background-color 0.2s'
+  }
+
+  const notificationStyle = {
+    backgroundColor: '#fee2e2',
+    color: '#991b1b',
+    padding: '12px',
+    borderRadius: '6px',
+    fontSize: '0.9rem',
+    textAlign: 'center',
+    marginBottom: '20px',
+    border: '1px solid #fca5a5'
+  }
+
+
   const handleUsername = (event) => setUsername(event.target.value)
   const handlePassword = (event) => setPassword(event.target.value)
 
   const handleLogin = (event) => {
     event.preventDefault()
     const userObj = { username, password }
-    if (!username || !password)
-    {
+    if (!username || !password) {
       setLoginNotification('username/ password are required')
       setTimeout(() => setLoginNotification(''), 5000)
       return
@@ -21,37 +94,52 @@ const Login = ({ onLogin }) => {
     onLogin(userObj)
 
     setPassword('')
-
   }
 
-  return (<div>
-    <h1>log in to application </h1>
 
-    <h3>{loginNotification}</h3>
-    <form onSubmit={handleLogin}>
-      <div>
-        username:
-        <input
-          name ="username"
-          type='text'
-          placeholder='put here your username'
-          value={username}
-          onChange={handleUsername}
-        />
-      </div>
+  return (
+    <div style={containerStyle}>
+      <h1 style={headerStyle}>Log in to application</h1>
 
-      <div>
-        password:
-        <input name ="password"
-          type='password'
-          placeholder='put here your password'
-          value={password}
-          onChange={handlePassword}
-        />
-      </div>
-      <button>login </button>
-    </form>
-  </div>)
+      {loginNotification && (
+        <div style={notificationStyle}>
+          {loginNotification}
+        </div>
+      )}
+
+      <form onSubmit={handleLogin} style={formStyle}>
+
+        <div style={inputGroupStyle}>
+          <label style={labelStyle}>Username</label>
+          <input
+            name="username"
+            type="text"
+            placeholder="Enter your username"
+            value={username}
+            onChange={handleUsername}
+            style={inputStyle}
+          />
+        </div>
+
+        <div style={inputGroupStyle}>
+          <label style={labelStyle}>Password</label>
+          <input
+            name="password"
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={handlePassword}
+            style={inputStyle}
+          />
+        </div>
+
+        <button type="submit" style={buttonStyle}>
+          Login
+        </button>
+
+      </form>
+    </div>
+  )
 }
 
 export default Login

@@ -1,12 +1,40 @@
 import { useState, forwardRef, useImperativeHandle } from 'react'
 
-
-const Toggleable = forwardRef(( { buttonLabel, buttonLabel2, children }, ref ) => {
-
+const Toggleable = forwardRef(({ buttonLabel, children }, ref) => {
   const [visible, setVisible] = useState(false)
 
-  const showWhenIsVisible = visible ? { 'display': '' } : { 'display': 'none' }
-  const hideWhenIsVisible = visible ? { 'display': 'none' } : { 'display': '' }
+
+  const containerStyle = {
+    margin: '20px 0'
+  }
+
+  const primaryButtonStyle = {
+    padding: '10px 16px',
+    backgroundColor: '#2563eb',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    fontSize: '0.95rem',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  }
+
+  const cancelButtonStyle = {
+    marginTop: '10px',
+    padding: '8px 12px',
+    backgroundColor: '#fee2e2',
+    color: '#991b1b',
+    border: 'none',
+    borderRadius: '6px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    fontSize: '0.9rem'
+  }
+
+
+  const hideWhenVisible = { display: visible ? 'none' : '' }
+  const showWhenVisible = { display: visible ? '' : 'none' }
 
   const setVisibility = () => {
     setVisible(!visible)
@@ -18,18 +46,28 @@ const Toggleable = forwardRef(( { buttonLabel, buttonLabel2, children }, ref ) =
     }
   })
 
+
   return (
-    <div>
-      <div style={hideWhenIsVisible}>
-        {children}
+    <div style={containerStyle}>
+
+      <div style={hideWhenVisible}>
+        <button onClick={setVisibility} style={primaryButtonStyle}>
+          {buttonLabel}
+        </button>
       </div>
-      <button style={showWhenIsVisible} onClick={() => setVisibility()}> {buttonLabel} </button>
-      <button style={hideWhenIsVisible} onClick={() => setVisibility()}> {buttonLabel2} </button>
+
+      <div style={showWhenVisible}>
+        {children}
+        <button onClick={setVisibility} style={cancelButtonStyle}>
+          cancel
+        </button>
+      </div>
+
     </div>
   )
-
 })
 
 Toggleable.displayName = 'Toggleable'
+
 
 export default Toggleable

@@ -102,6 +102,22 @@ const App = () => {
     } catch (error) {
       console.error(error)
       setNotification(`something went wrong. reason: ${error.response.data.error}`)
+      setTimeout(() => setNotification(''), 5000)
+
+    }
+  }
+
+  //like a blog--------------------------------------------------------------------
+  const likeBlog = async (id) => {
+    const blog = blogs.find (blog => blog.id === id)
+    try {
+      const likedBlog = await blogService.addLike(blog, id)
+      setBlogs(blogs.map(blog => blog.id===id ? likedBlog : blog))
+
+    } catch (error) {
+      console.error(error)
+      setNotification(`something went wrong. reason: ${error.response.data.error}`)
+      setTimeout(() => setNotification(''), 5000)
     }
   }
 
@@ -123,7 +139,7 @@ const App = () => {
           <h2>blogs</h2>
           <ul>
             {blogs.map(blog =>
-              <Blog key={blog.id} blog={blog} />
+              <Blog key={blog.id} blog={blog} like={likeBlog}/>
             )}
           </ul>
         </div>)
