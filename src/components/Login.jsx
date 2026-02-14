@@ -1,11 +1,11 @@
 import { useState } from 'react'
+import Notification from './Notification'
 
 const Login = ({ onLogin }) => {
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [loginNotification, setLoginNotification] = useState('')
-
+  const [notification, setNotification] = useState(null)
 
   const containerStyle = {
     maxWidth: '400px',
@@ -57,7 +57,7 @@ const Login = ({ onLogin }) => {
   const buttonStyle = {
     marginTop: '10px',
     padding: '12px',
-    backgroundColor: '#2563eb',
+    backgroundColor: '#8c8d8f',
     color: 'white',
     border: 'none',
     borderRadius: '6px',
@@ -68,17 +68,12 @@ const Login = ({ onLogin }) => {
     transition: 'background-color 0.2s'
   }
 
-  const notificationStyle = {
-    backgroundColor: '#fee2e2',
-    color: '#991b1b',
-    padding: '12px',
-    borderRadius: '6px',
-    fontSize: '0.9rem',
-    textAlign: 'center',
-    marginBottom: '20px',
-    border: '1px solid #fca5a5'
+  const notify = (message, type = 'info') => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
   }
-
 
   const handleUsername = (event) => setUsername(event.target.value)
   const handlePassword = (event) => setPassword(event.target.value)
@@ -87,8 +82,7 @@ const Login = ({ onLogin }) => {
     event.preventDefault()
     const userObj = { username, password }
     if (!username || !password) {
-      setLoginNotification('username/ password are required')
-      setTimeout(() => setLoginNotification(''), 5000)
+      notify('All fields are required', 'error')
       return
     }
     onLogin(userObj)
@@ -98,14 +92,14 @@ const Login = ({ onLogin }) => {
 
 
   return (
+
     <div style={containerStyle}>
+      <Notification
+        message={notification?.message}
+        type={notification?.type}
+      />
       <h1 style={headerStyle}>Log in to application</h1>
 
-      {loginNotification && (
-        <div style={notificationStyle}>
-          {loginNotification}
-        </div>
-      )}
 
       <form onSubmit={handleLogin} style={formStyle}>
 

@@ -1,10 +1,25 @@
 import { useState } from 'react'
+import Notification from './Notification'
+
+export const buttonStyle = {
+  marginTop: '10px',
+  width: '100%',
+  padding: '10px',
+  backgroundColor: '#8c8d8f',
+  color: 'white',
+  border: 'none',
+  borderRadius: '6px',
+  fontSize: '0.95rem',
+  fontWeight: '600',
+  cursor: 'pointer',
+  transition: 'background-color 0.2s'
+}
 
 const Form = ({ onCreate }) => {
   const [newTitle, setNewTitle] = useState('')
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
-  const [formNotification, setFormNotification] = useState('')
+  const [notification, setNotification] = useState(null)
 
   const formContainerStyle = {
     backgroundColor: 'white',
@@ -34,7 +49,7 @@ const Form = ({ onCreate }) => {
   const labelStyle = {
     fontSize: '0.875rem',
     fontWeight: '600',
-    color: '#374151',
+    color: '#8c8d8f',
     marginLeft: '2px'
   }
 
@@ -43,35 +58,20 @@ const Form = ({ onCreate }) => {
     borderRadius: '6px',
     border: '1px solid #d1d5db',
     fontSize: '0.95rem',
-    color: '#1f2937',
+    color: '#8c8d8f',
     outline: 'none',
     transition: 'border-color 0.2s',
     width: '100%',
     boxSizing: 'border-box'
   }
 
-  const buttonStyle = {
-    marginTop: '10px',
-    width: '100%',
-    padding: '10px',
-    backgroundColor: '#8c8d8f',
-    color: 'white',
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '0.95rem',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s'
-  }
 
-  const errorStyle = {
-    color: '#ef4444',
-    fontSize: '0.875rem',
-    margin: '0 0 10px 0',
-    backgroundColor: '#fee2e2',
-    padding: '8px',
-    borderRadius: '4px',
-    textAlign: 'center'
+
+  const notify = (message, type = 'info') => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
   }
 
 
@@ -85,8 +85,7 @@ const Form = ({ onCreate }) => {
     }
 
     if (!newTitle || !newAuthor || !newUrl) {
-      setFormNotification('All fields are required')
-      setTimeout(() => setFormNotification(''), 5000)
+      notify('All fields are required', 'error')
       return
     }
     onCreate(newBlog)
@@ -107,7 +106,10 @@ const Form = ({ onCreate }) => {
     <div style={formContainerStyle}>
       <h2 style={headerStyle}>Create new blog</h2>
 
-      {formNotification && <div style={errorStyle}>{formNotification}</div>}
+      <Notification
+        message={notification?.message}
+        type={notification?.type}
+      />
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
 
@@ -153,4 +155,4 @@ const Form = ({ onCreate }) => {
   )
 }
 
-export default Form
+export default  Form

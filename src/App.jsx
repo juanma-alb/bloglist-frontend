@@ -5,16 +5,26 @@ import loginService from './services/login'
 
 import Blog from './components/Blog'
 import Login from './components/Login'
-import Form  from './components/Form'
+import  Form, { buttonStyle }  from './components/Form'
 import Toggleable from './components/Toggleable'
+import Notification from './components/Notification'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [notification, setNotification] = useState('')
+  const [notification, setNotification] = useState(null)
 
   const blogPostRef = useRef()
+
+  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
+
+  const notify = (message, type = 'info') => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  }
 
   //get blogs-------------------------------------------------------
   useEffect(() => {
@@ -22,6 +32,7 @@ const App = () => {
       const allBlogs = await blogService.getAll()
       setBlogs(allBlogs)
       setIsLoading(false)
+      setNotification(null)
     }
     getAllBlogs()
 
@@ -37,7 +48,10 @@ const App = () => {
   }, [])
 
   if (isLoading)
-    return (<h1> loading... </h1>)
+    return (<h1> <Notification
+      message="loading..."
+      type={notification?.type}
+    /> </h1>)
 
   //login---------------------------------------------------------------------
   const loginUser = async (userObj) => {
@@ -52,18 +66,14 @@ const App = () => {
 
       blogService.setToken(currentUser.token)
 
-      setNotification(`welcome back ${currentUser.name}`)
-      setTimeout(() => setNotification(''), 5000)
-
+      notify(`Welcome back ${currentUser.name}`)
     } catch (error) {
 
       if (error.response.data.error.includes('wrong username or password')) {
-        setNotification(error.response.data.error)
-        setTimeout(() => setNotification(''), 5000)
+        notify('Wrong username or password', 'error')
 
       } else {
-        setNotification('somethig went wrong, try again')
-        setTimeout(() => setNotification(''), 5000)
+        notify('Somethig went worng, try again', 'error')
       }
       console.error (error)
     }
@@ -73,8 +83,7 @@ const App = () => {
   const logout = (event) => {
     event.preventDefault()
     window.localStorage.removeItem('loggedUser')
-    setNotification('logged out succesfully')
-    setTimeout(() => setNotification(''), 5000)
+    notify('logged out succesfully', 'info')
     setUser(null)
 
   }
@@ -85,24 +94,21 @@ const App = () => {
     const blogExist = blogs.some(blog => blog.title === blogObject.title)
     if (blogExist)
     {
-      setNotification('this blog title already exists, try another one')
+      notify('this blog title already exists, try another one', 'error')
 
-      setTimeout(() => setNotification(''), 5000)
       return
     }
     try {
 
       const newBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(newBlog))
-      setNotification('blog succesfully added')
-      setTimeout(() => setNotification(''), 5000)
+      notify('blog succesfully added', 'success')
       blogPostRef.current.setVisibility()
 
 
     } catch (error) {
       console.error(error)
-      setNotification(`something went wrong. reason: ${error.response.data.error}`)
-      setTimeout(() => setNotification(''), 5000)
+      notify(`something went wrong. reason: ${error.response.data.error}`, 'error')
 
     }
   }
@@ -116,32 +122,86 @@ const App = () => {
 
     } catch (error) {
       console.error(error)
-      setNotification(`something went wrong. reason: ${error.response.data.error}`)
-      setTimeout(() => setNotification(''), 5000)
+      notify(`something went wrong. reason: ${error.response.data.error}`, 'error')
     }
   }
 
+  //delete a blog ---------------------------------------------------------------
+
+  const deleteBlog = async (id) => {
+
+    const blogToDelete = blogs.find(blog => blog.id === id)
+
+    console.log(blogToDelete)
+
+    if (!blogToDelete){
+      notify('this blog may does not exist anymore', 'error')
+      setBlogs(blogs.filter(blog => blog.id!== id))
+      return
+    }
+
+    const isOwner = user.id === blogToDelete.user.id
+
+    if (!isOwner){
+      notify('you cant do this!', 'error')
+      return
+    }
+
+    try {
+      if (window.confirm(`are you sure you want to delete ${blogToDelete.title} by ${blogToDelete.author}?`)){
+        await blogService.deleteBlog(id)
+        setBlogs(blogs.filter(blog => blog.id!== id))
+      }
+    } catch (error) {
+      console.error(error)
+      notify(`something went wrong. reason: ${error.response.data.error}`, 'error')
+
+    }
+  }
+
+
   return (
     <div>
-      <div>{notification}</div>
+      <Notification
+        message={notification?.message}
+        type={notification?.type}
+      />
       {user===null
         ? (<Login
           onLogin={loginUser}
         />)
         :(<div>
           <div>
-            <h3> {user.name} logged in <button onClick={logout}> logout </button></h3>
+            <h3>
+              {user.name} logged in <button
+                style={{
+                  ...buttonStyle,
+                  width: 'auto',
+                  marginLeft: '5px',
+                  padding: '7px',
+                  backgroundColor: '#e07777',
+                  border: '1px solid #95989d',
+                  marginTop: 0,
+                }} onClick={logout}> logout
+              </button></h3>
           </div>
           <br/>
-          <Toggleable buttonLabel='add Note' buttonLabel2="cancel" ref={blogPostRef}><Form onCreate={addBlog}/></Toggleable>
+          <Toggleable buttonLabel='add Note' ref={blogPostRef}><Form onCreate={addBlog}/></Toggleable>
           <br/>
 
           <h2>blogs</h2>
-          <ul>
-            {blogs.map(blog =>
-              <Blog key={blog.id} blog={blog} like={likeBlog}/>
+          <div>
+            {sortedBlogs.map(blog =>
+              <Blog
+                key={blog.id}
+                blog={blog}
+                like={likeBlog}
+                user={user}
+                deleteBlog={deleteBlog}
+              />
             )}
-          </ul>
+
+          </div>
         </div>)
       }
     </div>

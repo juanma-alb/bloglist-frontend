@@ -1,7 +1,8 @@
 import { useState } from 'react'
 
-const Blog = ({ blog, like }) => {
+const Blog = ({ blog, like, user, deleteBlog }) => {
   const [visible, setVisible] = useState(false)
+
 
   const blogStyle = {
     padding: '15px 20px',
@@ -16,13 +17,15 @@ const Blog = ({ blog, like }) => {
   const headerStyle = {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    gap: '10px'
   }
 
   const titleStyle = {
     fontWeight: '700',
     fontSize: '1.1rem',
-    color: '#111827'
+    color: '#111827',
+    wordBreak: 'break-word'
   }
 
   const authorStyle = {
@@ -30,6 +33,13 @@ const Blog = ({ blog, like }) => {
     color: '#6b7280',
     fontSize: '0.9rem',
     marginLeft: '6px'
+  }
+
+  const actionsStyle = {
+    display: 'flex',
+    gap: '10px',
+    alignItems: 'center',
+    flexShrink: 0
   }
 
   const detailsContainerStyle = {
@@ -56,7 +66,6 @@ const Blog = ({ blog, like }) => {
     fontWeight: '500'
   }
 
-
   const userBadgeStyle = {
     backgroundColor: '#e0e7ff',
     color: '#3730a3',
@@ -68,7 +77,6 @@ const Blog = ({ blog, like }) => {
   }
 
   const buttonStyle = {
-    marginLeft: '10px',
     padding: '5px 12px',
     borderRadius: '6px',
     border: '1px solid #d1d5db',
@@ -80,6 +88,13 @@ const Blog = ({ blog, like }) => {
     transition: 'background-color 0.2s'
   }
 
+  const deleteButtonStyle = {
+    ...buttonStyle,
+    color: '#fff',
+    backgroundColor: '#e07777',
+    border: '1px solid #95989d',
+
+  }
 
   const showDetails = visible
     ? { ...detailsContainerStyle }
@@ -87,24 +102,39 @@ const Blog = ({ blog, like }) => {
 
   const label = visible ? 'hide' : 'view'
 
+  const isOwner = user && blog.user && user.username === blog.user.username
 
   return (
     <div style={blogStyle}>
       <div style={headerStyle}>
+
         <span style={titleStyle}>
           {blog.title}
           <span style={authorStyle}>by {blog.author}</span>
         </span>
 
-        <button onClick={() => setVisible(!visible)} style={buttonStyle}>
-          {label}
-        </button>
+        <div style={actionsStyle}>
+
+          {isOwner && (
+            <button
+              style={deleteButtonStyle}
+              onClick={() => deleteBlog(blog.id)}
+            >
+              delete
+            </button>
+          )}
+
+          <button onClick={() => setVisible(!visible)} style={buttonStyle}>
+            {label}
+          </button>
+        </div>
+
       </div>
 
       <ul style={showDetails}>
         <li style={itemStyle}>
           <span>Url:</span>
-          <a href={blog.url} style={linkStyle}>
+          <a href={blog.url} target="_blank" rel="noopener noreferrer" style={linkStyle}>
             {blog.url}
           </a>
         </li>
@@ -117,7 +147,7 @@ const Blog = ({ blog, like }) => {
         <li style={itemStyle}>
           <span>Added by:</span>
           <span style={userBadgeStyle}>
-            {blog.user?.username}
+            {blog.user?.username || 'Anonymous'}
           </span>
         </li>
       </ul>

@@ -10,7 +10,7 @@ const Toggleable = forwardRef(({ buttonLabel, children }, ref) => {
 
   const primaryButtonStyle = {
     padding: '10px 16px',
-    backgroundColor: '#2563eb',
+    backgroundColor: '#8c8d8f',
     color: 'white',
     border: 'none',
     borderRadius: '6px',
